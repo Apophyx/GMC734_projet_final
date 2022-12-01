@@ -1,0 +1,71 @@
+% MotionGenesis file:  Main.txt
+
+%--------------------------------------------------------------------
+%   Physical objects.
+NewtonianFrame  N                                   % The atmosphere
+RigidBody       Plane                               % Where Z is the longitudinal axis
+Particle        Pilot                               % 
+Point           Center_of_lift_L( Plane )           % Center of lift on the left wing
+Point           Center_of_lift_R( Plane )           % Center of lift on the right wing
+Point           Center_of_lift_stab( Plane )        % Center of lift on the horizontal stabilizer
+
+%--------------------------------------------------------------------
+%   Mathematical declarations.
+Variable   x'',y'',z''                  % The plane's positional coordinates and their derivatives
+Constant   g = 9.80665 m/s^2            % Earth's gravitational acceleration.
+Constant   Density = 1.225 kg / m3      % Standard atmosphere Density
+Constant   Thrust  =                    % Thrust from engine. Engine torque is neglected
+Constant   Drag_profile =               % Profile drag, applied at the plane's CM, opposite it's velocity vector
+Constant   x_wing = , y_wing = z_wing = 
+Constant   y_stab=, z_stab=
+
+Center_of_lift_L.SetPosition( Planeo, -x_wing*Planex> + y_wing*Planey> + z_wing*Planez)
+Center_of_lift_R.SetPosition( Planeo, x_wing*Planex> + y_wing*Planey> + z_wing*Planez )
+Center_of_lift_stab.SetPosition(Planeo,  y_stab*Planey> + z_stab*Planez)
+
+Plane.Translate(No, x*Nx>+y*Ny>+z*Nz>) %Comment savoir si translate ou SetPosition déjà?
+
+alpha_L =
+alpha_R =
+alpha_stab =
+
+Cl_L = some function of alpha_L from NACA2412 txt
+Cl_R = some function of alpha_R from NACA2412 txt
+Cl_stab = some function of alpha_stab from NACA2412 txt
+
+Lift_L = 0.5*Density*Cl_L*Plane.GetVelocity(N) %direction: perpendicular to wing
+Lift_R = 0.5*Density*Cl_R*Plane.GetVelocity(N) %direction: perpendicular to wing
+Lift_stab = 0.5*Density*Cl_stab*Plane.GetVelocity(N) %direction: perpendicular to wing
+
+Cd_L = some function of alpha_L  
+Cd_R = some function of alpha_R  
+Cd_stab = some function of alpha_stab
+
+Drag_L = 0.5*Density*Cd_L*Plane.GetVelocity(N) %direction: perpendicular to wing
+Drag_R = 0.5*Density*Cd_R*Plane.GetVelocity(N) %direction: perpendicular to wing
+Drag_stab = 0.5*Density*Cd_stab*Plane.GetVelocity(N) %direction: perpendicular to wing
+
+
+%   Mass and inertia properties.
+Plane.SetMass( mPlane = )
+Pilot.SetMass( mPilot = )
+Plane.SetInertia( Planecm,  IPlanexx = 0.2 kg*m^2,  IPlaneyy = 0.3 kg*m^2,  IPlanezz = 0.4 kg*m^2 )
+
+
+
+%   Add relevant contact/distance forces.
+System.AddForceGravity( -g*Ny> )            % Add's gravity force to each massive object.
+Plane.AddForce(Center_of_lift_L, Lift_L*Planey>)
+Plane.AddForce(Center_of_lift_R, Lift_R*Planey>)
+Plane.AddForce(Center_of_lift_stab, Lift_stab*stab_unit_vector>)
+Plane.AddForce(Planecm, Thrust*Planez>)
+Plane.AddForce(Planecm, -Drag_profile * Plane.GetVelocity(N).GetUnitVector(N))
+
+Dynamics[1] = Dot(  Plane.GetDynamics(),  Nx>  )
+Dynamics[2] = Dot(  Plane.GetDynamics(),  Ny>  )
+Dynamics[3] = Dot(  Plane.GetDynamics(),  Nz>  )
+
+Output      t sec,  x m, z m
+OutputPlot  x m, z m
+
+%For aerofoil plots: http://airfoiltools.com/airfoil/details?airfoil=naca2412-il
