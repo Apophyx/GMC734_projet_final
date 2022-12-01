@@ -33,7 +33,7 @@ Cl_L = some function of alpha_L from NACA2412 txt
 Cl_R = some function of alpha_R from NACA2412 txt
 Cl_stab = some function of alpha_stab from NACA2412 txt
 
-Lift_L = 0.5*Density*Cl_L*Plane.GetVelocity(N) %direction: perpendicular to wing
+Lift_L = 0.5*Density*Cl_L*Dot(Plane.GetVelocity(N), Plane.GetBelocity(N)) %direction: perpendicular to wing
 Lift_R = 0.5*Density*Cl_R*Plane.GetVelocity(N) %direction: perpendicular to wing
 Lift_stab = 0.5*Density*Cl_stab*Plane.GetVelocity(N) %direction: perpendicular to wing
 
