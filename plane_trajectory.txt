@@ -1,0 +1,61 @@
+% MotionGenesis file:  Main.txt
+
+%--------------------------------------------------------------------
+%   Physical objects.
+NewtonianFrame  N                                   % The atmosphere
+RigidBody       Plane                               % Where Z is the longitudinal axis
+Particle        Pilot                               % 
+Point           Center_of_lift_wing( Plane )           % Center of lift on the left wing
+Point           Center_of_lift_stab( Plane )        % Center of lift on the horizontal stabilizer
+
+%--------------------------------------------------------------------
+%   Mathematical declarations.
+Variable    x'', y'', z''                  % The plane's positional coordinates and their derivatives
+Constant    g = 9.80665 m/s^2            % Earth's gravitational acceleration.
+Constant    Density = 1.225 kg / m3      % Standard atmosphere Density
+Constant    Thrust  =                    % Thrust from engine. Engine torque is neglected
+Constant    Drag_profile =               % Profile drag, applied at the plane's CM, opposite it's velocity vector
+Constant    x_wing = , y_wing =
+Constant    x_stab = , y_stab =
+
+deflection = 
+
+theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
+
+alpha_wing= (IsNegative(90-theta)(-1)+IsPositive(90-theta)) * GetAngleBetweenVectorsDegrees(Planex>, Plane.Getvelocity(N))
+alpha_stab= alpha_wing + deflection
+
+Cl_wing= 2*sin(alpha_wing)*cos(alpha_wing) %From Morris
+Cl_stab= 2*sin(alpha_stab)*cos(alpha_stab) %From Morris
+
+Cd_wing = 2*sin(alpha_wing)^2 %From Morris
+Cd_stab = 2*sin(alpha_stab)^2 %From Morris
+
+Lift_wing = 0.5*Density*Cl_wing*Dot(Plane.GetVelocity(N), Plane.GetVelocity(N))
+Lift_stab = 0.5*Density*Cl_wing*Dot(Plane.GetVelocity(N), Plane.GetVelocity(N))
+Drag_wing = 0.5*Density*Cl_wing*Dot(Plane.GetVelocity(N), Plane.GetVelocity(N))
+Drag_stab = 0.5*Density*Cl_wing*Dot(Plane.GetVelocity(N), Plane.GetVelocity(N))
+
+%   Mass and inertia properties.
+Plane.SetMass( mPlane = 2300 pounds)
+Pilot.SetMass( mPilot = 100 pounds)
+Plane.SetInertia( Planecm,  IPlanexx = 0.2 kg*m^2,  IPlaneyy = 0.3 kg*m^2,  IPlanezz = 0.4 kg*m^2 ) %What approximations should we make?
+
+%   Add relevant contact/distance forces.
+System.AddForceGravity( -g*Ny> )            % Add's gravity force to each massive object.
+Plane.AddForce(Center_of_lift_wing, Lift_wing*Planey>)
+Plane.AddForce(Center_of_lift_stab, Lift_stab*Planey>) %replace Planey> with vector normal to stabilizer
+Plane.Addforce(Center_of_lift_wing, Drag_wing*Planex>)
+Plane.Addforce(Center_of_lift_stab, Drag_stab*Planex>) %replace Planex> with stabilizer direction vector
+Plane.AddForce(Planecm, Thrust*Planez>)
+
+
+Dynamics[1] = Dot(  Plane.GetDynamics(),  Nx>  )
+Dynamics[2] = Dot(  Plane.GetDynamics(),  Ny>  )
+
+
+Output      t sec,  x m, z m
+OutputPlot  x m, z m
+
+
+
