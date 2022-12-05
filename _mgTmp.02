@@ -3,112 +3,125 @@
    (3) %   Physical objects.
    (4) NewtonianFrame  N                                   % The atmosphere
    (5) RigidBody       Plane                               % Where Z is the longitudinal axis
-   (6) Particle        Pilot                               % 
-   (7) Point           wing( Plane )           % Center of lift on the left wing
-   (8) Point           stab( Plane )        % Center of lift on the horizontal stabilizer
-   (9) %--------------------------------------------------------------------
-   (10) %   Mathematical declarations.
-   (11) Variable    x'', y''                 % The plane's positional coordinates and their derivatives
-   (12) Constant    g = 9.80665 m/s^2            % Earth's gravitational acceleration.
-   (13) Constant    Density = 1.225 kg / m^3      % Standard atmosphere Density
-   (14) Constant    Thrust  = 1000 N                 % Thrust from engine. Engine torque is neglected
-   (15) %Constant    Drag_profile =               % Profile drag, applied at the plane's CM, opposite it's velocity vector
-   (16) Constant    x_wing = 1 m, y_wing = 0 m
-   (17) Constant    x_stab = -2 m, y_stab = 0 m
-   (18) Constant    S_wing= 20 m^2, S_stab= 10 m^2
-   (19) Planecm.Translate(No, x*Nx> + y*Ny>)
--> (20) p_No_Planecm> = x*Nx> + y*Ny>
--> (21) v_Planecm_N> = x'*Nx> + y'*Ny>
--> (22) a_Planecm_N> = x''*Nx> + y''*Ny>
+   (6) RigidFrame       Stab
+   (7) Particle        Pilot                               % 
+   (8) Point           wing( Plane )           % Center of lift on the left wing
+   (9) %Point           stab( Plane )        % Center of lift on the horizontal stabilizer
+   (10) %--------------------------------------------------------------------
+   (11) %   Mathematical declarations.
+   (12) Variable    x'', y''                            % The plane's positional coordinates and their derivatives
+   (13) Constant    g = 9.80665 m/s^2                   % Earth's gravitational acceleration.
+   (14) Constant    Density = 1.225 kg / m^3            % Standard atmosphere Density
+   (15) Constant    Thrust  = 10000 N                   % Thrust from engine. Engine torque is neglected
+   (16) %Constant    Drag_profile =                     % Profile drag, applied at the plane's CM, opposite it's velocity vector
+   (17) Constant    x_wing = 1 m, y_wing = 0 m
+   (18) Constant    x_stab = -2 m, y_stab = 0 m
+   (19) Constant    S_wing= 20 m^2, S_stab= 10 m^2
+   (20) Variable    alpha'                               % Main wing angle of attack
+   (21) Constant deflection = -10 degrees
+   (22) Planecm.Translate(No, x*Nx> + y*Ny>)
+-> (23) p_No_Planecm> = x*Nx> + y*Ny>
+-> (24) v_Planecm_N> = x'*Nx> + y'*Ny>
+-> (25) a_Planecm_N> = x''*Nx> + y''*Ny>
 
-   (23) Plane.RotateZ(N, 0)
--> (24) Plane_N = [1, 0, 0;  0, 1, 0;  0, 0, 1]
--> (25) w_Plane_N> = 0>
--> (26) alf_Plane_N> = 0>
+   (26) Stabo.SetPosition(Planeo, x_stab*Planex> + y_stab*Planey>)
+-> (27) p_Planeo_Stabo> = x_stab*Planex> + y_stab*Planey>
 
-   (27) wing.SetPosition(Planeo, x_wing*Planex> + y_wing*Planey>)
--> (28) p_Planeo_wing> = x_wing*Planex> + y_wing*Planey>
+   (28) Plane.RotateZ(N, alpha)
+-> (29) Plane_N = [cos(alpha), sin(alpha), 0;  -sin(alpha), cos(alpha), 0;  0, 0, 1]
+-> (30) w_Plane_N> = alpha'*Planez>
 
-   (29) stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
--> (30) p_Planeo_stab> = x_stab*Planex> + y_stab*Planey>
+   (31) Stab.RotateZ(Plane, deflection)
+-> (32) Stab_Plane = [cos(deflection), sin(deflection), 0;  -sin(deflection), 
+        cos(deflection), 0;  0, 0, 1]
+-> (33) w_Stab_Plane> = 0>
+-> (34) w_Stab_N> = alpha'*Planez>
+-> (35) alf_Stab_Plane> = 0>
 
-   (31) Constant deflection = - 2 degrees
-   (32) theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
--> (33) theta = 90
+   (36) wing.SetPosition(Planeo, x_wing*Planex> + y_wing*Planey>)
+-> (37) p_Planeo_wing> = x_wing*Planex> + y_wing*Planey>
 
-   (34) alpha_wing= (IsNegative(90-theta)*(-1)+IsPositive(90-theta)) * GetAngleBetweenVectorsDegrees(Planex>, Planecm.Getvelocity(N))
--> (35) alpha_wing = false
+   (38) %stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
+   (39) theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
+-> (40) theta = 57.29578*acos(sin(alpha))
 
-   (36) alpha_stab= alpha_wing + deflection
--> (37) alpha_stab = deflection
+   (41) %alpha= (IsNegative(90-theta)*(-1)+IsPositive(90-theta)) * GetAngleBetweenVectors(Planex>, Planecm.Getvelocity(N))
+   (42) alpha_stab= alpha + deflection
+-> (43) alpha_stab = deflection + alpha
 
-   (38) Cl_wing= 2*sin(alpha_wing)*cos(alpha_wing) %From Morris
--> (39) Cl_wing = 0
+   (44) Cl_wing= 2*sin(alpha)*cos(alpha) %From Morris
+-> (45) Cl_wing = 2*sin(alpha)*cos(alpha)
 
-   (40) Cl_stab= 2*sin(alpha_stab)*cos(alpha_stab) %From Morris
--> (41) Cl_stab = 2*sin(deflection)*cos(deflection)
+   (46) Cl_stab= 2*sin(alpha_stab)*cos(alpha_stab) %From Morris
+-> (47) Cl_stab = 2*sin(alpha_stab)*cos(alpha_stab)
 
-   (42) Cd_wing = 2*sin(alpha_wing)^2 %From Morris
--> (43) Cd_wing = 0
+   (48) Cd_wing = 2*sin(alpha)^2 %From Morris
+-> (49) Cd_wing = 2*sin(alpha)^2
 
-   (44) Cd_stab = 2*sin(alpha_stab)^2 %From Morris
--> (45) Cd_stab = 2*sin(deflection)^2
+   (50) Cd_stab = 2*sin(alpha_stab)^2 %From Morris
+-> (51) Cd_stab = 2*sin(alpha_stab)^2
 
-   (46) Lift_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
--> (47) Lift_wing = 0
+   (52) Lift_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
+-> (53) Lift_wing = 0.5*Density*S_wing*Cl_wing*(x'^2+y'^2)
 
-   (48) Lift_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
--> (49) Lift_stab = 0
+   (54) Lift_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
+-> (55) Lift_stab = 0.5*Density*S_stab*Cl_wing*(x'^2+y'^2)
 
-   (50) Drag_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
--> (51) Drag_wing = 0
+   (56) Drag_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
+-> (57) Drag_wing = 0.5*Density*S_wing*Cl_wing*(x'^2+y'^2)
 
-   (52) Drag_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
--> (53) Drag_stab = 0
+   (58) Drag_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
+-> (59) Drag_stab = 0.5*Density*S_stab*Cl_wing*(x'^2+y'^2)
 
-   (54) Constant r = 2 m
-   (55) Constant h = 10 m
-   (56) %   Mass and inertia properties.
-   (57) Plane.SetMass( mPlane = 2300 lbm)
-   (58) Pilot.SetMass( mPilot = 100 lbm)
-   (59) Plane.SetInertia( Planecm,  IPlanexx = (mPlane*(3*r^2+h^2)/12),  IPlaneyy = (mPlane*(3*r^2+h^2)/12) ,  IPlanezz = 0.5*mPlane*r^2 ) %What approximations should we make?
--> (60) IPlanexx = 0.08333333*mPlane*(h^2+3*r^2)
--> (61) IPlaneyy = 0.08333333*mPlane*(h^2+3*r^2)
--> (62) IPlanezz = 0.5*mPlane*r^2
+   (60) Constant r = 2 m
+   (61) Constant h = 10 m
+   (62) %   Mass and inertia properties.
+   (63) Plane.SetMass( mPlane = 2300 lbm)
+   (64) Pilot.SetMass( mPilot = 100 lbm)
+   (65) Plane.SetInertia( Planecm,  IPlanexx = (mPlane*(3*r^2+h^2)/12),  IPlaneyy = (mPlane*(3*r^2+h^2)/12) ,  IPlanezz = 0.5*mPlane*r^2 ) %What approximations should we make?
+-> (66) IPlanexx = 0.08333333*mPlane*(h^2+3*r^2)
+-> (67) IPlaneyy = 0.08333333*mPlane*(h^2+3*r^2)
+-> (68) IPlanezz = 0.5*mPlane*r^2
 
-   (63) %   Add relevant contact/distance forces.
-   (64) System.AddForceGravity( -g*Ny> )            % Add's gravity force to each massive object.
--> (65) Force_Pilot> = -mPilot*g*Ny>
--> (66) Force_Planecm> = -mPlane*g*Ny>
+   (69) %   Add relevant contact/distance forces.
+   (70) System.AddForceGravity( -g*Ny> )            % Add's gravity force to each massive object.
+-> (71) Force_Pilot> = -mPilot*g*Ny>
+-> (72) Force_Planecm> = -mPlane*g*Ny>
 
-   (67) wing.AddForce(Lift_wing*Planey>)
--> (68) Force_wing> = 0>
+   (73) wing.AddForce(Lift_wing*Planey>)
+-> (74) Force_wing> = Lift_wing*Planey>
 
-   (69) stab.AddForce(Lift_stab*Planey>) %replace Planey> with vector normal to stabilizer
--> (70) Force_stab> = 0>
+   (75) Stabo.AddForce(Lift_stab*Staby>) %replace Planey> with vector normal to stabilizer
+-> (76) Force_Stabo> = Lift_stab*Staby>
 
-   (71) wing.Addforce(Drag_wing*Planex>)
--> (72) Force_wing> = 0>
+   (77) wing.Addforce(Drag_wing*Planex>)
+-> (78) Force_wing> = Drag_wing*Planex> + Lift_wing*Planey>
 
-   (73) stab.Addforce(Drag_stab*Planex>) %replace Planex> with stabilizer direction vector
--> (74) Force_stab> = 0>
+   (79) Stabo.Addforce(Drag_stab*Planex>) %replace Planex> with stabilizer direction vector
+-> (80) Force_Stabo> = Drag_stab*Planex> + Lift_stab*Staby>
 
-   (75) Planecm.AddForce(Thrust*Planex>)
--> (76) Force_Planecm> = -mPlane*g*Ny> + Thrust*Planex>
+   (81) Planecm.AddForce(Thrust*Stabx>)
+-> (82) Force_Planecm> = -mPlane*g*Ny> + Thrust*Stabx>
 
-   (77) Dynamics[1] = Dot(  Plane.GetDynamics(),  Nx>  )
--> (78) Dynamics[1] = mPlane*x'' - Thrust
+   (83) Dynamics[1] = Dot(  Plane.GetDynamics(),  Nx>  )
+-> (84) Dynamics[1] = sin(alpha)*Lift_wing + mPlane*x'' - Thrust*cos(deflection
+        +alpha) - cos(alpha)*Drag_wing
 
-   (79) Dynamics[2] = Dot(  Plane.GetDynamics(),  Ny>  )
--> (80) Dynamics[2] = mPlane*(g+y'')
+   (85) Dynamics[2] = Dot(  Plane.GetDynamics(),  Ny>  )
+-> (86) Dynamics[2] = mPlane*(g+y'') - Thrust*sin(deflection+alpha) - sin(alpha)
+        *Drag_wing - cos(alpha)*Lift_wing
 
-   (81) Solve(Dynamics, x'', y'')
--> (82) x'' = Thrust/mPlane
--> (83) y'' = -g
+   (87) Solve(Dynamics, x'', y'')
+-> (88) x'' = -(sin(alpha)*Lift_wing-Thrust*cos(deflection+alpha)-cos(alpha)*
+        Drag_wing)/mPlane
+-> (89) y'' = (Thrust*sin(deflection+alpha)+sin(alpha)*Drag_wing+cos(alpha)*Li
+        ft_wing)/mPlane - g
 
-   (84) Input x=0 m, y=1000 m, x'=50 m/s, y'=0, tfinal = 100
-   (85) Output      t sec,  x m, y m
-   (86) OutputPlot  x m, y m
-   (87) ODE()
+   (90) Input alpha = 3 degrees
+   (91) Input x=0 m, y=1000 m, x'=100 m/s, y'=0 m/s, tfinal = 100
+   (92) Output      t sec,  x m, y m, Lift_wing N, Lift_stab N, alpha degrees
+   (93) OutputPlot  x m, y m
+   (94) OutputPlot  y m, alpha degrees, alpha_stab degrees
+   (95) ODE()
 
-   (88) 
+   (96) 
