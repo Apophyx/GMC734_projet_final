@@ -1,3 +1,7 @@
+<!DOCTYPE html><HTML LANG="en"><HEAD><TITLE>MotionGenesis: MGplane.html</TITLE><STYLE>.BoldDarkBlueNoWrap {font-weight:bold; color:darkBlue; white-space:nowrap;}</STYLE></HEAD>
+<BODY STYLE="background-color:#FFFFFF; margin:8px 0px 0px 8px">
+<DIV class="BoldDarkBlueNoWrap"><SPAN STYLE="font-size:large;">MGplane.html</SPAN> &nbsp; <SPAN STYLE="font-size:small;">(MotionGenesis input/output)</SPAN>.</DIV>
+<PRE>
    (1) % MotionGenesis file:  Main.txt
    (2) %--------------------------------------------------------------------
    (3) %   Physical objects.
@@ -16,9 +20,9 @@
    (16) Constant    Thrust  = 10000 N                   % Thrust from engine. Engine torque is neglected
    (17) %Constant    Drag_profile =                     % Profile drag, applied at the plane's CM, opposite it's velocity vector
    (18) Constant    x_wing = 1 m, y_wing = 0 m
-   (19) Constant    x_stab = -1 m, y_stab = 0 m
-   (20) Constant    S_wing= 10 m^2, S_stab= 10 m^2
-   (21) Constant deflection = -0 degrees
+   (19) Constant    x_stab = -2 m, y_stab = 0 m
+   (20) Constant    S_wing= 20 m^2, S_stab= 10 m^2
+   (21) Constant deflection = -1 degrees
    (22) Planecm.Translate(No, x*Nx> + y*Ny>)
 -> (23) p_No_Planecm> = x*Nx> + y*Ny>
 -> (24) v_Planecm_N> = x'*Nx> + y'*Ny>
@@ -132,4 +136,6 @@
    (102) Output      t sec,  x m, y m, Lift_wing N, Lift_stab N, alpha degrees
    (103) OutputPlot  x m, y m
    (104) OutputPlot  y m, alpha degrees, alpha_stab degrees
-   (105) ODE()
+</PRE>
+<DIV class="BoldDarkBlueNoWrap" STYLE="font-size:x-small;">Saved by Maxime Couture. &nbsp; Command names and syntax: Copyright (c) 2009-2021 Motion Genesis LLC.  All rights reserved.</DIV>
+</BODY></HTML>
