@@ -19,7 +19,7 @@ Constant    Thrust  = 10000 N                   % Thrust from engine. Engine tor
 %Constant    Drag_profile =                     % Profile drag, applied at the plane's CM, opposite it's velocity vector
 Constant    x_wing = 1 m, y_wing = 0 m
 Constant    x_stab = -1 m, y_stab = 0 m
-Constant    S_wing= 10 m^2, S_stab= 10 m^2
+Constant    S_wing= 1 m^2, S_stab= 1 m^2
 
 Constant deflection = -0 degrees
 
@@ -32,7 +32,7 @@ Stab.SetAngularVelocity(Plane, 0>)
 wing.SetPosition(Planecm, x_wing*Planex> + y_wing*Planey>)
 %stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
 
-theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
+%theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
 
 %alpha= (IsNegative(90-theta)*(-1)+IsPositive(90-theta)) * GetAngleBetweenVectors(Planex>, Planecm.Getvelocity(N))
 alpha_stab= alpha + deflection
@@ -76,8 +76,8 @@ Dynamics[3] = Dot(  Plane.GetDynamics( Planecm ),  Nz>  )
 Solve(Dynamics, x'', y'', alpha'')
 
 
-Input alpha = 3 degrees, alpha'=0
-Input x=0 m, y=1000 m, x'=100 m/s, y'=0 m/s, tfinal = 100, tstep= 0.02 sec
+Input alpha = 1 degrees, alpha'=0
+Input x=0 m, y=1000 m, x'=100 m/s, y'=0 m/s, tfinal = 10, tstep= 0.02 sec
 
 Output      t sec,  x m, y m, Lift_wing N, Lift_stab N, alpha degrees
 OutputPlot  x m, y m
@@ -86,5 +86,7 @@ OutputPlot  y m, alpha degrees, alpha_stab degrees
 ODE()
 
 Save MGplane.html
+
+
 
 

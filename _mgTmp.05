@@ -17,7 +17,7 @@ Constant    Thrust  = 10000 N                   % Thrust from engine. Engine tor
 %Constant    Drag_profile =                     % Profile drag, applied at the plane's CM, opposite it's velocity vector
 Constant    x_wing = 1 m, y_wing = 0 m
 Constant    x_stab = -1 m, y_stab = 0 m
-Constant    S_wing= 10 m^2, S_stab= 10 m^2
+Constant    S_wing= 1 m^2, S_stab= 1 m^2
 Constant deflection = -0 degrees
 Planecm.Translate(No, x*Nx> + y*Ny>)
 Stabo.SetPosition(Planecm, x_stab*Planex> + y_stab*Planey>)
@@ -57,10 +57,9 @@ Dynamics[1] = Dot(  Plane.GetDynamics(),  Nx>  )
 Dynamics[2] = Dot(  Plane.GetDynamics(),  Ny>  )
 Dynamics[3] = Dot(  Plane.GetDynamics( Planecm ),  Nz>  )
 Solve(Dynamics, x'', y'', alpha'')
-Input alpha = 0 degrees, alpha'=0
-Input x=0 m, y=1000 m, x'=100 m/s, y'=0 m/s, tfinal = 100, tstep= 0.02 sec
+Input alpha = 1 degrees, alpha'=0
+Input x=0 m, y=1000 m, x'=100 m/s, y'=0 m/s, tfinal = 10, tstep= 0.02 sec
 Output      t sec,  x m, y m, Lift_wing N, Lift_stab N, alpha degrees
 OutputPlot  x m, y m
 OutputPlot  y m, alpha degrees, alpha_stab degrees
-ODE()
 
