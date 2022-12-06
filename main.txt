@@ -37,11 +37,18 @@ wing.SetPosition(Planecm, x_wing*Planex> + y_wing*Planey>)
 %alpha= (IsNegative(90-theta)*(-1)+IsPositive(90-theta)) * GetAngleBetweenVectors(Planex>, Planecm.Getvelocity(N))
 alpha_stab= alpha + deflection
 
+
+%====================================
+
+%Redifine from Xfoil polars
+
 Cl_wing= 2*sin(alpha)*cos(alpha) %From Morris
 Cl_stab= 2*sin(alpha_stab)*cos(alpha_stab) %From Morris
 
 Cd_wing = 2*sin(alpha)^2 %From Morris
 Cd_stab = 2*sin(alpha_stab)^2 %From Morris
+
+%===========================================
 
 Lift_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
 Lift_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
