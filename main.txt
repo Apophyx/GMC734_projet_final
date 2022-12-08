@@ -4,10 +4,10 @@
 %   Physical objects.
 NewtonianFrame  N                                   % The atmosphere
 RigidBody       Plane                               % Where Z is the longitudinal axis
-RigidFrame       Stab
+RigidFrame      Stab
 Particle        Pilot                               % 
 Point           wing( Plane )           % Center of lift on the left wing
-%Point           stab( Plane )        % Center of lift on the horizontal stabilizer
+Point           stabpoint( Plane )        % Center of lift on the horizontal stabilizer
 
 %--------------------------------------------------------------------
 %   Mathematical declarations.
@@ -23,12 +23,13 @@ Constant    S_wing= 10 m^2, S_stab= 10 m^2
 Constant deflection = 0 degrees
 
 Planecm.Translate(No, x*Nx> + y*Ny>)
-Stabo.SetPosition(Planecm, x_stab*Planex> + y_stab*Planey>)
 Plane.RotateZ(N, qa)
-Stab.RotateZ(Plane, deflection)
-Stab.SetAngularVelocity(Plane, 0>)
+%Stabo.SetPosition(Planecm, x_stab*Planex> + y_stab*Planey>)
+stabpoint.Translate(Planecm, x_stab*Planex> + y_stab*Planey>)
 
-wing.SetPosition(Planecm, x_wing*Planex> + y_wing*Planey>)
+Stab.RotateZ(Plane, deflection)
+%Stab.SetAngularVelocity(Plane, 0>)
+wing.Translate(Planecm, x_wing*Planex> + y_wing*Planey>)
 %stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
 
 %theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
@@ -57,9 +58,9 @@ Cd_stab = 2*sin(alpha_stab)^2 %From Morris
 %===========================================
 
 Lift_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
-Lift_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
-Drag_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
-Drag_stab = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
+Lift_stab = 0.5*Density*Cl_stab*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
+Drag_wing = 0.5*Density*Cd_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
+Drag_stab = 0.5*Density*Cd_stab*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
 
 
 
@@ -76,13 +77,14 @@ System.AddForceGravity( -g*Ny> )            % Adds gravity force to each massive
 
 %Lift
 wing.AddForce(Lift_wing*Planey>)
-Stabo.AddForce(Lift_stab*Staby>)
+stabpoint.AddForce(Lift_stab*Staby>)
+
 %Drag
 %wing.Addforce(-Drag_wing*Planex>)
 %Stabo.Addforce(-Drag_stab*Stabx>) -GetUnitvector(Planecm.GetVelocity(N))
 
 wing.Addforce(-Drag_wing*GetUnitvector(Planecm.GetVelocity(N)))
-Stabo.Addforce(-Drag_stab*GetUnitvector(Planecm.GetVelocity(N)))
+stabpoint.Addforce(-Drag_stab*GetUnitvector(Planecm.GetVelocity(N)))
 
 %Thrust
 Planecm.AddForce(Thrust*Planex>)
@@ -95,12 +97,14 @@ Solve(Dynamics, x'', y'', qa'')
 
 stab_w = getmagnitude(Stab.getangularvelocity(Plane)) %check that it is 0
 
-Input qa = 3 degrees, qa'=0
+Input qa = 0 degrees, qa'=0
 Input x=0 m, y=1000 m, x'= 100 m/s, y'=0 m/s, tfinal = 10, tstep= 0.02 sec
 
 Output      t sec,  x m, y m, qa degrees, alpha degrees, stab_w degrees/sec
-OutputPlot  x m, y m
+%OutputPlot  x m, y m
 OutputPlot  t sec, alpha degrees, alpha_stab degrees
+OutputPlot  t sec, Lift_wing, Lift_stab
+OutputPlot  t sec, qa''
 
 ODE()
 
