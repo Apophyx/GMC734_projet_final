@@ -25,16 +25,16 @@ Constant    x_stab_C172 = 4.24 m, y_stab_C172 = 0.5 m
 Constant    efficiency=0.735 noUnits, power_a=116.6 kiloWatt
 
 
-Constant deflection = 0 degrees
+Constant deflection = 3 degrees
 
 Planecm.Translate(No, x*Nx> + y*Ny>)
 Plane.RotateZ(N, qa)
 %Stabo.SetPosition(Planecm, x_stab*Planex> + y_stab*Planey>)
-stabpoint.Translate(Planecm, x_stab_172*Planex> + y_stab_172*Planey>)
+stabpoint.Translate(Planecm, x_stab_C172*Planex> + y_stab_C172*Planey>)
 
 Stab.RotateZ(Plane, deflection)
 %Stab.SetAngularVelocity(Plane, 0>)
-wing.Translate(Planecm, x_wing_172*Planex> + y_wing_172*Planey>)
+wing.Translate(Planecm, x_wing_C172*Planex> + y_wing_C172*Planey>)
 %stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
 
 %theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
@@ -94,7 +94,7 @@ wing.Addforce(-Drag_wing*GetUnitvector(Planecm.GetVelocity(N)))
 stabpoint.Addforce(-Drag_stab*GetUnitvector(Planecm.GetVelocity(N)))
 
 %Thrust
-Planecm.AddForce((efficiency*power_a/Planecm.Getvelocity(N))*Planex>)
+Planecm.AddForce((efficiency*power_a/(64))*Planex>) % 64 m/s = 120 kts
 
 
 Dynamics[1] = Dot(  Plane.GetDynamics(),  Nx>  )
