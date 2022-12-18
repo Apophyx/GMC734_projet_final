@@ -113,7 +113,7 @@ OutputPlot  t sec, alpha degrees, alpha_stab degrees
 %OutputPlot  t sec, Lift_wing, Lift_stab
 OutputPlot  t sec, qa'', qa', qa
 
-ODE()
+ODE() C172stability.m
 
 
 
