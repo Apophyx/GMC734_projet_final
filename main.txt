@@ -21,7 +21,7 @@ Constant    x_stab = -1 m, y_stab = 0 m
 Constant    S_wing= 10 m^2, S_stab= 10 m^2
 Constant    S_wing_C172 = 16.2 m^2, S_stab_C172 = 3.96 m^2
 Constant    x_wing_C172 = 0.25 m, y_wing_C172 = 1 m
-Constant    x_stab_C172 = 4.24 m, y_wingC172 = 0.5 m
+Constant    x_stab_C172 = 4.24 m, y_stab_C172 = 0.5 m
 Constant    efficiency=0.735 noUnits, power_a=116.6 kiloWatt
 
 
@@ -30,11 +30,11 @@ Constant deflection = 0 degrees
 Planecm.Translate(No, x*Nx> + y*Ny>)
 Plane.RotateZ(N, qa)
 %Stabo.SetPosition(Planecm, x_stab*Planex> + y_stab*Planey>)
-stabpoint.Translate(Planecm, x_stab*Planex> + y_stab*Planey>)
+stabpoint.Translate(Planecm, x_stab_172*Planex> + y_stab_172*Planey>)
 
 Stab.RotateZ(Plane, deflection)
 %Stab.SetAngularVelocity(Plane, 0>)
-wing.Translate(Planecm, x_wing*Planex> + y_wing*Planey>)
+wing.Translate(Planecm, x_wing_172*Planex> + y_wing_172*Planey>)
 %stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
 
 %theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
