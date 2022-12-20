@@ -29,12 +29,12 @@ g                               =  9.80665;                % m/s^2              
 mPlane                          =  779;                    % kg                  Constant
 power_a                         =  116.6;                  % kiloWatt            Constant
 r                               =  2;                      % m                   Constant
-S_stab                          =  10;                     % m^2                 Constant
-S_wing                          =  10;                     % m^2                 Constant
-x_stab_C172                     = -4.24;                   % m                   Constant
-x_wing_C172                     =  0.25;                   % m                   Constant
-y_stab_C172                     =  0.5;                    % m                   Constant
-y_wing_C172                     =  1;                      % m                   Constant
+S_stab                          =  3.96;                   % m^2                 Constant
+S_wing                          =  16.2;                   % m^2                 Constant
+x_stab                          = -4.24;                   % m                   Constant
+x_wing                          =  0.25;                   % m                   Constant
+y_stab                          =  0.5;                    % m                   Constant
+y_wing                          =  1;                      % m                   Constant
 
 qa                              =  0;                      % degrees             Initial Value
 x                               =  0;                      % m                   Initial Value
@@ -85,9 +85,9 @@ Cl_wing = 2*sin(alpha)*cos(alpha)*IsPositive(50-alpha);
 Lift_wing = 0.5*Density*S_wing*(xDt^2+yDt^2)*Cl_wing;
 xDDt = 0.015625*(efficiency*power_a*cos(qa)-64*(xDt*Drag_stab+xDt*Drag_wing+yDt*Lift_stab+yDt*Lift_wing)/sqrt(xDt^2+yDt^2))/mPlane;
 yDDt = 0.015625*(efficiency*power_a*sin(qa)+64*(xDt*Lift_stab+xDt*Lift_wing-yDt*Drag_stab-yDt*Drag_wing)/sqrt(xDt^2+yDt^2))/mPlane - g;
-qaDDt = (x_stab_C172*(sin(qa)*(xDt*Drag_stab+yDt*Lift_stab)+cos(qa)*(xDt*Lift_stab-yDt*Drag_stab))+x_wing_C172*(sin(qa)*(xDt*  ...
-Drag_wing+yDt*Lift_wing)+cos(qa)*(xDt*Lift_wing-yDt*Drag_wing))+y_stab_C172*(cos(qa)*(xDt*Drag_stab+yDt*Lift_stab)-sin(qa)*(xDt*  ...
-Lift_stab-yDt*Drag_stab))+y_wing_C172*(cos(qa)*(xDt*Drag_wing+yDt*Lift_wing)-sin(qa)*(xDt*Lift_wing-yDt*Drag_wing)))/(IPlanezz*sqrt(xDt^2+yDt^2));
+qaDDt = (x_stab*(sin(qa)*(xDt*Drag_stab+yDt*Lift_stab)+cos(qa)*(xDt*Lift_stab-yDt*Drag_stab))+x_wing*(sin(qa)*(xDt*Drag_wing+yDt*  ...
+Lift_wing)+cos(qa)*(xDt*Lift_wing-yDt*Drag_wing))+y_stab*(cos(qa)*(xDt*Drag_stab+yDt*Lift_stab)-sin(qa)*(xDt*Lift_stab-yDt*  ...
+Drag_stab))+y_wing*(cos(qa)*(xDt*Drag_wing+yDt*Lift_wing)-sin(qa)*(xDt*Lift_wing-yDt*Drag_wing)))/(IPlanezz*sqrt(xDt^2+yDt^2));
 
 sys = transpose( SetMatrixOfDerivativesPriorToIntegrationStep );
 end
@@ -136,7 +136,7 @@ end
 %===========================================================================
 function Output = mdlOutputs( t, VAR, uSimulink )
 %===========================================================================
-Output = zeros( 1, 15 );
+Output = zeros( 1, 11 );
 Output(1) = t;
 Output(2) = x;
 Output(3) = y;
@@ -150,11 +150,6 @@ Output(8) = y;
 Output(9) = t;
 Output(10) = alpha*RADtoDEG;
 Output(11) = alpha_stab*RADtoDEG;
-
-Output(12) = t;
-Output(13) = qaDDt;
-Output(14) = qaDt;
-Output(15) = qa*RADtoDEG;
 end
 
 
@@ -165,9 +160,9 @@ persistent FileIdentifier hasHeaderInformationBeenWritten;
 
 if( isempty(Output) ),
    if( ~isempty(FileIdentifier) ),
-      for( i = 1 : 4 ),  fclose( FileIdentifier(i) );  end
+      for( i = 1 : 3 ),  fclose( FileIdentifier(i) );  end
       clear FileIdentifier;
-      fprintf( 1, '\n Output is in the files C172stability.i  (i=1,2,3,4)\n\n' );
+      fprintf( 1, '\n Output is in the files C172stability.i  (i=1,2,3)\n\n' );
    end
    clear hasHeaderInformationBeenWritten;
    return;
@@ -179,7 +174,7 @@ if( isempty(hasHeaderInformationBeenWritten) ),
       fprintf( 1,                '%%     (sec)           (m)            (m)         (degrees)      (degrees)    (degrees/sec)\n\n' );
    end
    if( shouldPrintToFile && isempty(FileIdentifier) ),
-      FileIdentifier = zeros( 1, 4 );
+      FileIdentifier = zeros( 1, 3 );
       FileIdentifier(1) = fopen('C172stability.1', 'wt');   if( FileIdentifier(1) == -1 ), error('Error: unable to open file C172stability.1'); end
       fprintf(FileIdentifier(1), '%% FILE: C172stability.1\n%%\n' );
       fprintf(FileIdentifier(1), '%%       t              x              y             qa            alpha         stab_w\n' );
@@ -192,10 +187,6 @@ if( isempty(hasHeaderInformationBeenWritten) ),
       fprintf(FileIdentifier(3), '%% FILE: C172stability.3\n%%\n' );
       fprintf(FileIdentifier(3), '%%       t            alpha       alpha_stab\n' );
       fprintf(FileIdentifier(3), '%%     (sec)        (degrees)      (degrees)\n\n' );
-      FileIdentifier(4) = fopen('C172stability.4', 'wt');   if( FileIdentifier(4) == -1 ), error('Error: unable to open file C172stability.4'); end
-      fprintf(FileIdentifier(4), '%% FILE: C172stability.4\n%%\n' );
-      fprintf(FileIdentifier(4), '%%       t            qa''''            qa''            qa\n' );
-      fprintf(FileIdentifier(4), '%%     (sec)         (UNITS)        (UNITS)       (degrees)\n\n' );
    end
    hasHeaderInformationBeenWritten = 1;
 end
@@ -204,7 +195,6 @@ if( shouldPrintToScreen ), WriteNumericalData( 1,                 Output(1:6) );
 if( shouldPrintToFile ),   WriteNumericalData( FileIdentifier(1), Output(1:6) );  end
 if( shouldPrintToFile ),   WriteNumericalData( FileIdentifier(2), Output(7:8) );  end
 if( shouldPrintToFile ),   WriteNumericalData( FileIdentifier(3), Output(9:11) );  end
-if( shouldPrintToFile ),   WriteNumericalData( FileIdentifier(4), Output(12:15) );  end
 end
 
 
@@ -237,13 +227,6 @@ figure;
 data = load( 'C172stability.3' ); 
 plot( data(:,1),data(:,2),'-b', data(:,1),data(:,3),'-.g', 'LineWidth',3 );
 legend( 'alpha (degrees)', 'alpha_stab (degrees)' );
-xlabel('t (sec)');   % ylabel('Some y-axis label');   title('Some plot title');
-clear data;
-
-figure;
-data = load( 'C172stability.4' ); 
-plot( data(:,1),data(:,2),'-b', data(:,1),data(:,3),'-.g', data(:,1),data(:,4),'--r', 'LineWidth',3 );
-legend( 'qa''''', 'qa''', 'qa (degrees)' );
 xlabel('t (sec)');   % ylabel('Some y-axis label');   title('Some plot title');
 clear data;
 end

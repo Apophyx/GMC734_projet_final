@@ -15,21 +15,18 @@ Variable    x'', y''                            % The plane's positional coordin
 Variable    qa''                             % Main wing angle of attack
 Constant    g = 9.80665 m/s^2                   % Earth's gravitational acceleration.
 Constant    Density = 1.225 kg / m^3            % Standard atmosphere Density
-Constant    x_wing = 1 m, y_wing = 0 m
-Constant    x_stab = -1 m, y_stab = 0 m
-Constant    S_wing= 10 m^2, S_stab= 10 m^2
-Constant    S_wing_C172 = 16.2 m^2, S_stab_C172 = 3.96 m^2
-Constant    x_wing_C172 = 0.25 m, y_wing_C172 = 1 m
-Constant    x_stab_C172 = -4.24 m, y_stab_C172 = 0.5 m
+Constant    S_wing  = 16.2 m^2, S_stab  = 3.96 m^2
+Constant    x_wing  = 0.25 m, y_wing  = 1 m
+Constant    x_stab  = -4.24 m, y_stab  = 0.5 m
 Constant    efficiency=0.735 noUnits, power_a=116.6 kiloWatt
-Constant deflection = -5 degrees
+Constant    deflection = -5 degrees
 
 Planecm.Translate(No, x*Nx> + y*Ny>)
 Plane.RotateZ(N, qa)
-stabpoint.Translate(Planecm, x_stab_C172*Planex> + y_stab_C172*Planey>)
+stabpoint.Translate(Planecm, x_stab *Planex> + y_stab *Planey>)
 
 Stab.RotateZ(Plane, deflection)
-wing.Translate(Planecm, x_wing_C172*Planex> + y_wing_C172*Planey>)
+wing.Translate(Planecm, x_wing *Planex> + y_wing *Planey>)
 
 
 
@@ -95,11 +92,11 @@ Output      t sec,  x m, y m, qa degrees, alpha degrees, stab_w degrees/sec
 OutputPlot  x m, y m
 OutputPlot  t sec, alpha degrees, alpha_stab degrees
 %OutputPlot  t sec, Lift_wing, Lift_stab
-OutputPlot  t sec, qa'', qa', qa
+%OutputPlot  t sec, qa'', qa', qa
 
 ODE()
 
-%ODE() C172stability.m
+ODE() C172stability.m
 
 
 
