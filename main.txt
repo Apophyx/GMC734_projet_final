@@ -15,7 +15,6 @@ Variable    x'', y''                            % The plane's positional coordin
 Variable    qa''                             % Main wing angle of attack
 Constant    g = 9.80665 m/s^2                   % Earth's gravitational acceleration.
 Constant    Density = 1.225 kg / m^3            % Standard atmosphere Density
-%Constant    Thrust  = 10000 N                   % Thrust from engine. Engine torque is neglected
 Constant    x_wing = 1 m, y_wing = 0 m
 Constant    x_stab = -1 m, y_stab = 0 m
 Constant    S_wing= 10 m^2, S_stab= 10 m^2
@@ -23,30 +22,22 @@ Constant    S_wing_C172 = 16.2 m^2, S_stab_C172 = 3.96 m^2
 Constant    x_wing_C172 = 0.25 m, y_wing_C172 = 1 m
 Constant    x_stab_C172 = -4.24 m, y_stab_C172 = 0.5 m
 Constant    efficiency=0.735 noUnits, power_a=116.6 kiloWatt
-
-
 Constant deflection = -5 degrees
 
 Planecm.Translate(No, x*Nx> + y*Ny>)
 Plane.RotateZ(N, qa)
-%Stabo.SetPosition(Planecm, x_stab*Planex> + y_stab*Planey>)
 stabpoint.Translate(Planecm, x_stab_C172*Planex> + y_stab_C172*Planey>)
 
 Stab.RotateZ(Plane, deflection)
-%Stab.SetAngularVelocity(Plane, 0>)
 wing.Translate(Planecm, x_wing_C172*Planex> + y_wing_C172*Planey>)
-%stab.SetPosition(Planeo,  x_stab*Planex> + y_stab*Planey>)
 
-%theta=GetAngleBetweenVectorsDegrees(Planex>, Ny>) %Used to define the sign of alpha
-%alpha= (IsNegative(90-theta)*(-1)+IsPositive(90-theta)) * GetAngleBetweenVectors(Planex>, Planecm.Getvelocity(N))
+
 
 alpha=GetAngleBetweenVectors(Planecm.Getvelocity(N), Planex>, Nz>)
 alpha_stab= alpha + deflection
 
 
-%====================================
-
-%Redefine from Xfoil polars
+%Aerodynamic coefficients====================================
 
 Cl_wing= IsPositive(50-alpha)*2*sin(alpha)*cos(alpha) %From Morris
 Cl_stab= IsPositive(50-alpha)*2*sin(alpha_stab)*cos(alpha_stab) %From Morris
@@ -55,7 +46,7 @@ Cl_stab= IsPositive(50-alpha)*2*sin(alpha_stab)*cos(alpha_stab) %From Morris
 Cd_wing = 2*sin(alpha)^2 %From Morris
 Cd_stab = 2*sin(alpha_stab)^2 %From Morris
 
-%===========================================
+%Aerodynamique forces===========================================
 
 Lift_wing = 0.5*Density*Cl_wing*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_wing
 Lift_stab = 0.5*Density*Cl_stab*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(N))*S_stab
@@ -64,27 +55,29 @@ Drag_stab = 0.5*Density*Cd_stab*Dot(Planecm.GetVelocity(N), Planecm.GetVelocity(
 
 
 
-%   Mass and inertia properties.
+%Mass and inertia properties===========================================
 Constant r = 2 m
 Constant h = 10 m
 Plane.SetMass( mPlane = 779 kg)
 Pilot.SetMass( mPilot = 100 lbm)
 Plane.SetInertia( Planecm,  IPlanexx = (mPlane*(3*r^2+h^2)/12),  IPlaneyy = (mPlane*(3*r^2+h^2)/12) ,  IPlanezz = 0.5*mPlane*r^2 ) %What approximations should we make?
 
-%   Add relevant contact/distance forces.
+%Relevant contact/distance forces===========================================
 
-System.AddForceGravity( -g*Ny> )            % Adds gravity force to each massive object.
+%Gravity-----
 
-%Lift==============================================================
-wing.AddForce(Lift_wing*cross(GetUnitvector(Planecm.GetVelocity(N)), -Nz> )) %change unit vector
-stabpoint.AddForce(Lift_stab*cross(GetUnitvector(Planecm.GetVelocity(N)), -Nz> )) %change unit vector
+System.AddForceGravity( -g*Ny> )
 
-%Drag==============================================================
+%Lift-----
+wing.AddForce(Lift_wing*cross(GetUnitvector(Planecm.GetVelocity(N)), -Nz> ))
+stabpoint.AddForce(Lift_stab*cross(GetUnitvector(Planecm.GetVelocity(N)), -Nz> ))
+
+%Drag----
 
 wing.Addforce(-Drag_wing*GetUnitvector(Planecm.GetVelocity(N)))
 stabpoint.Addforce(-Drag_stab*GetUnitvector(Planecm.GetVelocity(N)))
 
-%Thrust==============================================================
+%Thrust-----
 Planecm.AddForce((efficiency*power_a/(64))*Planex>) % 64 m/s = 120 kts
 
 %Solving dynamics==============================================================
@@ -106,7 +99,7 @@ OutputPlot  t sec, qa'', qa', qa
 
 ODE()
 
-ODE() C172stability.m
+%ODE() C172stability.m
 
 
 
