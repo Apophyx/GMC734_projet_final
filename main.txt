@@ -18,8 +18,15 @@ Constant    Density = 1.225 kg / m^3            % Standard atmosphere Density
 Constant    S_wing  = 16.2 m^2, S_stab  = 3.96 m^2
 Constant    x_wing  = 0.25 m, y_wing  = 1 m
 Constant    x_stab  = -4.24 m, y_stab  = 0.5 m
-Constant    efficiency=0.735 noUnits, power_a=116.6 kiloWatt
+Constant    efficiency=0.735 noUnits, power_a = 116.6 kiloWatt
 Constant    deflection = -5 degrees
+
+%PC-12------------
+%Constant    S_wing  = 25.8 m^2, S_stab  = 5.6 m^2
+%Constant    x_wing  = 0.025 m, y_wing  = 0.2 m
+%Constant    x_stab  = -7.15 m, y_stab  = 2.3 m
+%Constant    efficiency=0.735 noUnits, power_a=882.6 kiloWatt
+%Constant    m = 4740 kg
 
 Planecm.Translate(No, x*Nx> + y*Ny>)
 Plane.RotateZ(N, qa)
